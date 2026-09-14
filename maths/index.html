@@ -9,6 +9,29 @@
 <body>
 <iframe id="mathsApp" src="./app.html" title="Edexcel Foundation Maths Revision Tracker"></iframe>
 <script>
+const GROUPS=[
+  {title:'1. Core Number Skills',start:1,end:13},
+  {title:'2. Factors, Multiples & Powers',start:14,end:26},
+  {title:'3. Fractions, Decimals, Percentages & Accuracy',start:27,end:40},
+  {title:'4. Algebra Basics',start:41,end:60},
+  {title:'5. Graphs',start:61,end:75},
+  {title:'6. Equations & Inequalities',start:76,end:86},
+  {title:'7. Sequences',start:87,end:95},
+  {title:'8. Ratio',start:96,end:105},
+  {title:'9. Scale & Proportion',start:106,end:114},
+  {title:'10. Percentages, Interest, Growth & Decay',start:115,end:124},
+  {title:'11. Compound Measures & Similarity',start:125,end:136},
+  {title:'12. Angles, Shapes & Polygons',start:137,end:150},
+  {title:'13. Constructions, Congruence & Transformations',start:151,end:167},
+  {title:'14. Circles & 3D Shapes',start:168,end:181},
+  {title:'15. Area, Perimeter, Surface Area & Volume',start:182,end:199},
+  {title:'16. Bearings, Coordinates, Pythagoras & Trigonometry',start:200,end:209},
+  {title:'17. Vectors',start:210,end:214},
+  {title:'18. Basic Probability',start:215,end:224},
+  {title:'19. Combined Probability',start:225,end:236},
+  {title:'20. Statistics',start:237,end:266}
+];
+
 const frame=document.getElementById('mathsApp');
 frame.addEventListener('load',()=>setTimeout(()=>{
   try{
@@ -16,70 +39,52 @@ frame.addEventListener('load',()=>setTimeout(()=>{
     const science=d.querySelector('.toolbar a[href="../"]');
     if(science) science.remove();
 
-    const extraStyle=d.createElement('style');
-    extraStyle.textContent=`
-      .major-section{margin:22px 0 30px}
-      .major-section>h2{margin:0 0 10px;padding:0 2px;font-size:22px;color:#eef4ff}
-      .major-section .topic{margin:9px 0}
-      .major-section .topic summary{padding:13px 15px}
+    const subtitle=d.querySelector('.titlewrap .small');
+    if(subtitle) subtitle.innerHTML='20 topic groups • 266 revision packages • <span id="saveStatus">Auto-save on</span> • saved in this browser';
+
+    const style=d.createElement('style');
+    style.textContent=`
+      #app{margin-top:8px}
+      .topic{margin:10px 0}
+      .topic summary{padding:15px 16px;font-size:16px}
+      .topic-count{font-size:12px;color:#9fb0cf;font-weight:600;margin-left:auto;margin-right:12px}
+      @media(max-width:760px){.topic-count{display:none}}
     `;
-    d.head.appendChild(extraStyle);
+    d.head.appendChild(style);
 
     const app=d.getElementById('app');
-    if(!app || app.dataset.regrouped==='1') return;
-    const original=[...app.children].filter(el=>el.matches('details.topic'));
-    const fragment=d.createDocumentFragment();
+    if(!app || app.dataset.twentyGroups==='1') return;
 
-    original.forEach(big=>{
-      const majorTitle=big.querySelector('summary span:first-child')?.textContent?.trim() || 'Maths';
-      const section=d.createElement('section');
-      section.className='major-section';
-      const heading=d.createElement('h2');
-      heading.textContent=majorTitle;
-      section.appendChild(heading);
+    const allItems=[...app.querySelectorAll('.item')];
+    const byId=new Map(allItems.map(el=>[Number(el.dataset.item),el]));
+    const frag=d.createDocumentFragment();
 
-      const oldBody=big.querySelector('.topic-body');
-      let current=null;
-      [...oldBody.children].forEach(node=>{
-        if(node.classList.contains('subhead')){
-          current=d.createElement('details');
-          current.className='topic';
-          const summary=d.createElement('summary');
-          summary.innerHTML=`<span>${node.textContent.trim()}</span><span class="topicPct">0%</span>`;
-          const body=d.createElement('div');
-          body.className='topic-body';
-          current.append(summary,body);
-          section.appendChild(current);
-        }else if(node.classList.contains('item')){
-          if(!current){
-            current=d.createElement('details');
-            current.className='topic';
-            const summary=d.createElement('summary');
-            summary.innerHTML='<span>Skills</span><span class="topicPct">0%</span>';
-            const body=d.createElement('div');
-            body.className='topic-body';
-            current.append(summary,body);
-            section.appendChild(current);
-          }
-          current.querySelector('.topic-body').appendChild(node);
-        }
+    GROUPS.forEach(g=>{
+      const detail=d.createElement('details');
+      detail.className='topic';
+      const ids=[];
+      for(let id=g.start;id<=g.end;id++) if(byId.has(id)) ids.push(id);
+      detail.dataset.ids=ids.join(',');
+
+      const summary=d.createElement('summary');
+      const vals=ids.map(id=>{
+        const el=byId.get(id);
+        return parseInt(el.querySelector('.value')?.textContent||'0',10)||0;
       });
+      const average=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
+      summary.innerHTML=`<span>${g.title}</span><span class="topic-count">${ids.length} packages</span><span class="topicPct">${average}%</span>`;
 
-      [...section.querySelectorAll('details.topic')].forEach(group=>{
-        const items=[...group.querySelectorAll('.item')];
-        const ids=items.map(el=>Number(el.dataset.item));
-        group.dataset.ids=ids.join(',');
-        const vals=items.map(el=>parseInt(el.querySelector('.value')?.textContent||'0',10)||0);
-        const average=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
-        group.querySelector('.topicPct').textContent=average+'%';
-      });
-      fragment.appendChild(section);
+      const body=d.createElement('div');
+      body.className='topic-body';
+      ids.forEach(id=>body.appendChild(byId.get(id)));
+      detail.append(summary,body);
+      frag.appendChild(detail);
     });
 
-    app.replaceChildren(fragment);
-    app.dataset.regrouped='1';
-  }catch(err){console.error('Maths regrouping failed',err)}
-},80));
+    app.replaceChildren(frag);
+    app.dataset.twentyGroups='1';
+  }catch(err){console.error('20-group maths layout failed',err)}
+},100));
 </script>
 </body>
 </html>
