@@ -4,163 +4,82 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Edexcel Foundation Maths Revision Tracker</title>
-<style>
-:root {
- --bg:#0b1020;--panel:#121a2d;--panel2:#17213a;--text:#eef4ff;--muted:#9fb0cf;
- --line:#263452;--accent:#8cc8ff;--green:#7ee2a8;--danger:#ff7d8b;
-}
-*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1020,#10182a);color:var(--text)}
-button,input{font:inherit} a{color:#9ed5ff}
-header{position:sticky;top:0;z-index:10;background:rgba(11,16,32,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.topbar{max-width:1180px;margin:auto;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.titlewrap{flex:1} h1{font-size:clamp(20px,3vw,31px);margin:0} .small{font-size:13px;color:var(--muted)}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap} .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 12px;border-radius:10px;cursor:pointer;text-decoration:none}
-.btn.primary{background:#1c4d79;border-color:#2f6a9d} .btn.danger{background:#572a34;border-color:#75404c}
-.wrap{max-width:1180px;margin:auto;padding:18px}
-.note{background:#13213a;border:1px solid #294b72;border-radius:14px;padding:12px 14px;color:#cfe6ff}
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px} .big{font-size:26px;font-weight:800}
-.progress{height:10px;background:#202b44;border-radius:999px;overflow:hidden;margin-top:8px} .progress>div{height:100%;background:linear-gradient(90deg,#4aa3df,#7ee2a8);width:0}
-.search{width:min(390px,100%);padding:10px 12px;border-radius:11px;border:1px solid var(--line);background:#0e1628;color:white;margin-bottom:10px}
-.topic{border:1px solid var(--line);background:var(--panel);border-radius:16px;margin:12px 0;overflow:hidden}
-.topic summary{cursor:pointer;padding:15px 16px;font-weight:850;display:flex;justify-content:space-between;gap:12px;align-items:center}
-.topic summary::-webkit-details-marker{display:none} .topic-body{padding:0 12px 14px}
-.subhead{font-weight:850;color:#c7dcff;margin:13px 4px 7px;font-size:15px}
-.item{display:grid;grid-template-columns:minmax(220px,1fr) 42px minmax(150px,330px) 42px 68px 78px;align-items:center;gap:8px;padding:10px;border-top:1px solid #202c47}
-.name{line-height:1.25} .num{color:var(--muted);font-size:12px;margin-right:7px}
-.step,.rev{border:1px solid var(--line);background:#1b2742;color:white;border-radius:10px;height:38px;cursor:pointer;font-weight:900}
-.rev{border-color:#315d49;background:#163d2f;color:#aef0c7;font-size:12px} input[type=range]{width:100%;accent-color:#74c8ff}
-.value{text-align:center;font-weight:800} .done .name{color:#9deab9} .hidden{display:none!important}
-footer{padding:22px 0 40px;color:var(--muted);font-size:13px}
-@media(max-width:760px){
- .summary{grid-template-columns:1fr 1fr}
- .item{grid-template-columns:1fr 38px 1fr 38px 58px;gap:6px}
- .rev{grid-column:1/-1}
-}
-</style>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b1020}iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#0b1020}</style>
 </head>
 <body>
-<header><div class="topbar">
- <div class="titlewrap">
-   <h1>🔢 Edexcel Foundation Maths Revision Tracker</h1>
-   <div class="small">266 revision packages • <span id="saveStatus">Auto-save on</span> • saved in this browser</div>
- </div>
- <div class="toolbar">
-   <a class="btn" href="../">🧬 Science</a>
-   <button class="btn primary" id="exportBtn">Export progress</button>
-   <label class="btn">Import progress<input id="importFile" type="file" accept=".json" hidden></label>
-   <button class="btn danger" id="resetBtn">Reset all</button>
- </div>
-</div></header>
-
-<main class="wrap">
- <div class="note"><b>Saved memory is ON.</b> Your slider values save automatically on this GitHub Pages website. Use the same browser/device and this same URL to keep your progress. Export/Import gives you a backup or lets you move progress to another device.</div>
- <div class="summary">
-   <div class="card"><div class="small">Overall progress</div><div class="big" id="overallPct">0%</div><div class="progress"><div id="overallBar"></div></div></div>
-   <div class="card"><div class="small">Packages started</div><div class="big" id="startedCount">0 / 266</div></div>
-   <div class="card"><div class="small">Packages mastered</div><div class="big" id="masteredCount">0 / 266</div></div>
-   <div class="card"><div class="small">Revision points</div><div class="big" id="totalPoints">0</div></div>
- </div>
- <input class="search" id="search" placeholder="Search a maths package...">
- <div id="app"></div>
- <footer>Use each slider as your confidence/mastery score. +/− changes it precisely, and “+1 revised” records another step of progress.</footer>
-</main>
-
+<iframe id="mathsApp" src="./app.html" title="Edexcel Foundation Maths Revision Tracker"></iframe>
 <script>
-const DATA={"1. Number": [{"title": "1A Number Skills", "items": [{"id": 1, "name": "Ordering integers"}, {"id": 2, "name": "Ordering decimals"}, {"id": 3, "name": "Ordering fractions"}, {"id": 4, "name": "Positive and negative numbers"}, {"id": 5, "name": "Place value"}, {"id": 6, "name": "Addition and subtraction"}, {"id": 7, "name": "Multiplication"}, {"id": 8, "name": "Division"}, {"id": 9, "name": "Decimal calculations"}, {"id": 10, "name": "Fraction calculations"}, {"id": 11, "name": "Improper fractions and mixed numbers"}, {"id": 12, "name": "Inverse operations"}, {"id": 13, "name": "BIDMAS / order of operations"}]}, {"title": "1B Factors, Multiples and Powers", "items": [{"id": 14, "name": "Prime numbers"}, {"id": 15, "name": "Factors and multiples"}, {"id": 16, "name": "HCF"}, {"id": 17, "name": "LCM"}, {"id": 18, "name": "Prime factorisation"}, {"id": 19, "name": "Systematic listing"}, {"id": 20, "name": "Square numbers and square roots"}, {"id": 21, "name": "Cube numbers and cube roots"}, {"id": 22, "name": "Powers and roots"}, {"id": 23, "name": "Integer indices"}, {"id": 24, "name": "Calculating with roots"}, {"id": 25, "name": "Exact calculations with fractions and π"}, {"id": 26, "name": "Standard form"}]}, {"title": "1C Fractions, Decimals and Percentages", "items": [{"id": 27, "name": "Fraction ↔ decimal conversions"}, {"id": 28, "name": "Decimal ↔ percentage conversions"}, {"id": 29, "name": "Fraction ↔ percentage conversions"}, {"id": 30, "name": "Fractions of amounts"}, {"id": 31, "name": "Percentages of amounts"}, {"id": 32, "name": "Fractions in ratio problems"}]}, {"title": "1D Accuracy and Measures", "items": [{"id": 33, "name": "Metric units"}, {"id": 34, "name": "Converting standard units"}, {"id": 35, "name": "Estimation"}, {"id": 36, "name": "Checking calculations by estimation"}, {"id": 37, "name": "Rounding to decimal places"}, {"id": 38, "name": "Rounding to significant figures"}, {"id": 39, "name": "Error intervals"}, {"id": 40, "name": "Limits of accuracy / bounds"}]}], "2. Algebra": [{"title": "2A Algebra Basics", "items": [{"id": 41, "name": "Algebra notation"}, {"id": 42, "name": "Terms and coefficients"}, {"id": 43, "name": "Expressions"}, {"id": 44, "name": "Equations"}, {"id": 45, "name": "Formulae"}, {"id": 46, "name": "Identities"}, {"id": 47, "name": "Substitution"}, {"id": 48, "name": "Collecting like terms"}, {"id": 49, "name": "Expanding single brackets"}, {"id": 50, "name": "Factorising into a single bracket"}, {"id": 51, "name": "Expanding double brackets"}, {"id": 52, "name": "Factorising simple quadratics"}, {"id": 53, "name": "Difference of two squares"}, {"id": 54, "name": "Laws of indices"}, {"id": 55, "name": "Simplifying expressions with powers"}, {"id": 56, "name": "Roots and simple surds"}, {"id": 57, "name": "Using formulae"}, {"id": 58, "name": "Rearranging formulae"}, {"id": 59, "name": "Algebraic proof and identities"}, {"id": 60, "name": "Functions — inputs and outputs"}]}, {"title": "2B Graphs", "items": [{"id": 61, "name": "Coordinates in four quadrants"}, {"id": 62, "name": "Plotting straight-line graphs"}, {"id": 63, "name": "y = mx + c"}, {"id": 64, "name": "Gradient"}, {"id": 65, "name": "y-intercept"}, {"id": 66, "name": "Parallel lines"}, {"id": 67, "name": "Finding equations of straight lines"}, {"id": 68, "name": "Quadratic graphs"}, {"id": 69, "name": "Roots of quadratic graphs"}, {"id": 70, "name": "Turning points"}, {"id": 71, "name": "Cubic graphs"}, {"id": 72, "name": "Reciprocal graphs"}, {"id": 73, "name": "Real-life graphs"}, {"id": 74, "name": "Distance-time graphs"}, {"id": 75, "name": "Speed / rate graphs"}]}, {"title": "2C Equations and Inequalities", "items": [{"id": 76, "name": "One-step equations"}, {"id": 77, "name": "Two-step equations"}, {"id": 78, "name": "Equations with brackets"}, {"id": 79, "name": "Unknowns on both sides"}, {"id": 80, "name": "Solving equations graphically"}, {"id": 81, "name": "Quadratic equations by factorising"}, {"id": 82, "name": "Simultaneous equations"}, {"id": 83, "name": "Forming equations from problems"}, {"id": 84, "name": "Forming simultaneous equations"}, {"id": 85, "name": "Linear inequalities"}, {"id": 86, "name": "Inequalities on number lines"}]}, {"title": "2D Sequences", "items": [{"id": 87, "name": "Term-to-term rules"}, {"id": 88, "name": "Position-to-term rules"}, {"id": 89, "name": "Arithmetic sequences"}, {"id": 90, "name": "Triangular numbers"}, {"id": 91, "name": "Square and cube sequences"}, {"id": 92, "name": "Fibonacci-type sequences"}, {"id": 93, "name": "Recognising quadratic sequences"}, {"id": 94, "name": "Recognising geometric sequences"}, {"id": 95, "name": "nth term of linear sequences"}]}], "3. Ratio, Proportion and Rates of Change": [{"title": "3A Ratio", "items": [{"id": 96, "name": "Ratio notation"}, {"id": 97, "name": "Simplifying ratios"}, {"id": 98, "name": "Equivalent ratios"}, {"id": 99, "name": "Part-to-part ratios"}, {"id": 100, "name": "Part-to-whole ratios"}, {"id": 101, "name": "Sharing amounts in a ratio"}, {"id": 102, "name": "Ratios and fractions"}, {"id": 103, "name": "Ratio problem solving"}, {"id": 104, "name": "Recipe and mixture problems"}, {"id": 105, "name": "Scaling quantities"}]}, {"title": "3B Scale and Proportion", "items": [{"id": 106, "name": "Scale factors"}, {"id": 107, "name": "Scale drawings"}, {"id": 108, "name": "Maps and scales"}, {"id": 109, "name": "Direct proportion"}, {"id": 110, "name": "Inverse proportion"}, {"id": 111, "name": "Direct proportion equations"}, {"id": 112, "name": "Inverse proportion equations"}, {"id": 113, "name": "Direct proportion graphs"}, {"id": 114, "name": "Inverse proportion graphs"}]}, {"title": "3C Percentages", "items": [{"id": 115, "name": "Finding percentages"}, {"id": 116, "name": "Expressing one amount as a percentage"}, {"id": 117, "name": "Comparing quantities using percentages"}, {"id": 118, "name": "Percentage increase"}, {"id": 119, "name": "Percentage decrease"}, {"id": 120, "name": "Reverse percentages / original values"}, {"id": 121, "name": "Percentages greater than 100%"}, {"id": 122, "name": "Simple interest"}, {"id": 123, "name": "Compound interest"}, {"id": 124, "name": "Growth and decay"}]}, {"title": "3D Compound Measures", "items": [{"id": 125, "name": "Speed"}, {"id": 126, "name": "Distance-speed-time"}, {"id": 127, "name": "Density"}, {"id": 128, "name": "Mass-density-volume"}, {"id": 129, "name": "Pressure"}, {"id": 130, "name": "Rates of pay"}, {"id": 131, "name": "Unit pricing / best buys"}, {"id": 132, "name": "Converting compound units"}, {"id": 133, "name": "Gradient as a rate of change"}]}, {"title": "3E Ratio and Similarity", "items": [{"id": 134, "name": "Length scale factors"}, {"id": 135, "name": "Area scale factors"}, {"id": 136, "name": "Volume scale factors"}]}], "4. Geometry and Measures": [{"title": "4A Angles and Shapes", "items": [{"id": 137, "name": "Geometrical notation"}, {"id": 138, "name": "Parallel and perpendicular lines"}, {"id": 139, "name": "Symmetry"}, {"id": 140, "name": "Properties of triangles"}, {"id": 141, "name": "Properties of quadrilaterals"}, {"id": 142, "name": "Angles at a point"}, {"id": 143, "name": "Angles on a straight line"}, {"id": 144, "name": "Vertically opposite angles"}, {"id": 145, "name": "Corresponding angles"}, {"id": 146, "name": "Alternate angles"}, {"id": 147, "name": "Angles in triangles"}, {"id": 148, "name": "Interior angles of polygons"}, {"id": 149, "name": "Exterior angles of polygons"}, {"id": 150, "name": "Regular polygons"}]}, {"title": "4B Constructions", "items": [{"id": 151, "name": "Perpendicular bisectors"}, {"id": 152, "name": "Constructing perpendicular lines"}, {"id": 153, "name": "Angle bisectors"}, {"id": 154, "name": "Loci"}, {"id": 155, "name": "Distance from a point to a line"}]}, {"title": "4C Congruence, Similarity and Transformations", "items": [{"id": 156, "name": "Triangle congruence — SSS"}, {"id": 157, "name": "Triangle congruence — SAS"}, {"id": 158, "name": "Triangle congruence — ASA"}, {"id": 159, "name": "Triangle congruence — RHS"}, {"id": 160, "name": "Geometric reasoning and proof"}, {"id": 161, "name": "Reflection"}, {"id": 162, "name": "Rotation"}, {"id": 163, "name": "Translation"}, {"id": 164, "name": "Enlargement"}, {"id": 165, "name": "Fractional scale factors"}, {"id": 166, "name": "Congruent shapes"}, {"id": 167, "name": "Similar shapes"}]}, {"title": "4D Circles", "items": [{"id": 168, "name": "Radius and diameter"}, {"id": 169, "name": "Circumference"}, {"id": 170, "name": "Chords"}, {"id": 171, "name": "Tangents"}, {"id": 172, "name": "Arcs"}, {"id": 173, "name": "Sectors and segments"}]}, {"title": "4E 3D Shapes", "items": [{"id": 174, "name": "Cubes and cuboids"}, {"id": 175, "name": "Prisms"}, {"id": 176, "name": "Cylinders"}, {"id": 177, "name": "Pyramids"}, {"id": 178, "name": "Cones"}, {"id": 179, "name": "Spheres"}, {"id": 180, "name": "Faces, edges and vertices"}, {"id": 181, "name": "Plans and elevations"}]}, {"title": "4F Area, Perimeter and Volume", "items": [{"id": 182, "name": "Perimeter"}, {"id": 183, "name": "Area of rectangles"}, {"id": 184, "name": "Area of triangles"}, {"id": 185, "name": "Area of parallelograms"}, {"id": 186, "name": "Area of trapezia"}, {"id": 187, "name": "Composite areas"}, {"id": 188, "name": "Circumference of circles"}, {"id": 189, "name": "Area of circles"}, {"id": 190, "name": "Volume of cuboids"}, {"id": 191, "name": "Volume of prisms"}, {"id": 192, "name": "Volume of cylinders"}, {"id": 193, "name": "Surface area"}, {"id": 194, "name": "Volume of pyramids"}, {"id": 195, "name": "Volume of cones"}, {"id": 196, "name": "Volume of spheres"}, {"id": 197, "name": "Composite solids"}, {"id": 198, "name": "Arc length"}, {"id": 199, "name": "Area of sectors"}]}, {"title": "4G Bearings and Coordinates", "items": [{"id": 200, "name": "Measuring angles"}, {"id": 201, "name": "Scale drawings"}, {"id": 202, "name": "Bearings"}, {"id": 203, "name": "Coordinate geometry problems"}]}, {"title": "4H Pythagoras and Trigonometry", "items": [{"id": 204, "name": "Pythagoras' theorem"}, {"id": 205, "name": "Finding missing lengths using Pythagoras"}, {"id": 206, "name": "SOHCAHTOA"}, {"id": 207, "name": "Finding lengths using trigonometry"}, {"id": 208, "name": "Finding angles using trigonometry"}, {"id": 209, "name": "Exact trig values"}]}, {"title": "4I Vectors", "items": [{"id": 210, "name": "Translation vectors"}, {"id": 211, "name": "Column vectors"}, {"id": 212, "name": "Adding vectors"}, {"id": 213, "name": "Subtracting vectors"}, {"id": 214, "name": "Multiplying vectors by scalars"}]}], "5. Probability": [{"title": "5A Basic Probability", "items": [{"id": 215, "name": "Probability scale from 0 to 1"}, {"id": 216, "name": "Impossible, unlikely, even chance and certain"}, {"id": 217, "name": "Equally likely outcomes"}, {"id": 218, "name": "Fair and unfair experiments"}, {"id": 219, "name": "Theoretical probability"}, {"id": 220, "name": "Experimental probability"}, {"id": 221, "name": "Relative frequency"}, {"id": 222, "name": "Expected frequency"}, {"id": 223, "name": "Probabilities adding to 1"}, {"id": 224, "name": "Mutually exclusive events"}]}, {"title": "5B Combined Probability", "items": [{"id": 225, "name": "Frequency tables"}, {"id": 226, "name": "Frequency trees"}, {"id": 227, "name": "Systematic listing"}, {"id": 228, "name": "Sample spaces"}, {"id": 229, "name": "Two-way tables"}, {"id": 230, "name": "Probability grids"}, {"id": 231, "name": "Venn diagrams"}, {"id": 232, "name": "Tree diagrams"}, {"id": 233, "name": "Independent events"}, {"id": 234, "name": "Dependent events"}, {"id": 235, "name": "Combined probability"}, {"id": 236, "name": "Effect of increasing sample size"}]}], "6. Statistics": [{"title": "6A Collecting Data", "items": [{"id": 237, "name": "Populations and samples"}, {"id": 238, "name": "Sampling"}, {"id": 239, "name": "Limitations of samples"}, {"id": 240, "name": "Categorical data"}, {"id": 241, "name": "Discrete data"}, {"id": 242, "name": "Continuous data"}, {"id": 243, "name": "Grouped data"}]}, {"title": "6B Charts and Tables", "items": [{"id": 244, "name": "Frequency tables"}, {"id": 245, "name": "Bar charts"}, {"id": 246, "name": "Pictograms"}, {"id": 247, "name": "Pie charts"}, {"id": 248, "name": "Vertical line charts"}, {"id": 249, "name": "Time-series graphs"}, {"id": 250, "name": "Choosing appropriate graphs"}]}, {"title": "6C Averages and Spread", "items": [{"id": 251, "name": "Mean"}, {"id": 252, "name": "Median"}, {"id": 253, "name": "Mode"}, {"id": 254, "name": "Modal class"}, {"id": 255, "name": "Range"}, {"id": 256, "name": "Outliers"}, {"id": 257, "name": "Comparing distributions"}]}, {"title": "6D Scatter Graphs", "items": [{"id": 258, "name": "Scatter graphs"}, {"id": 259, "name": "Positive correlation"}, {"id": 260, "name": "Negative correlation"}, {"id": 261, "name": "No correlation"}, {"id": 262, "name": "Correlation vs causation"}, {"id": 263, "name": "Lines of best fit"}, {"id": 264, "name": "Making predictions"}, {"id": 265, "name": "Interpolation"}, {"id": 266, "name": "Extrapolation"}]}]};
-const STORAGE_KEY="edexcel_foundation_maths_tracker_v1";
-let state={};
-let db=null;
+const frame=document.getElementById('mathsApp');
+frame.addEventListener('load',()=>setTimeout(()=>{
+  try{
+    const d=frame.contentDocument;
+    const science=d.querySelector('.toolbar a[href="../"]');
+    if(science) science.remove();
 
-function openDB(){
- return new Promise((resolve,reject)=>{
-   try{const r=indexedDB.open("EdexcelFoundationMathsRevisionDB",1);
-   r.onupgradeneeded=()=>r.result.createObjectStore("progress");
-   r.onsuccess=()=>{db=r.result;resolve(db)};
-   r.onerror=()=>reject(r.error);}catch(e){reject(e)}
- });
-}
-async function idbGet(){
- if(!db)return null;
- return new Promise(resolve=>{try{const tx=db.transaction("progress","readonly");const r=tx.objectStore("progress").get("state");r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>resolve(null)}catch(e){resolve(null)}});
-}
-function idbPut(v){if(!db)return;try{db.transaction("progress","readwrite").objectStore("progress").put(v,"state")}catch(e){}}
-function localGet(){try{const x=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");return x&&typeof x==="object"?x:null}catch(e){return null}}
-function saveState(){
- try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){}
- idbPut(state);
- const s=document.getElementById("saveStatus");
- if(s){s.textContent="✓ Saved";clearTimeout(window.__saveTimer);window.__saveTimer=setTimeout(()=>s.textContent="Auto-save on",1200)}
- updateSummary();
-}
-async function init(){
- try{if(navigator.storage&&navigator.storage.persist)await navigator.storage.persist()}catch(e){}
- try{await openDB()}catch(e){}
- const a=localGet(),b=await idbGet();
- state=(b&&Object.keys(b).length?b:a)||{};
- if(a&&(!b||!Object.keys(b).length))idbPut(a);
- render();
-}
-function allItems(){
- const out=[];
- Object.entries(DATA).forEach(([topic,subs])=>subs.forEach(sub=>sub.items.forEach(i=>out.push({...i,topic,sub:sub.title}))));
- return out;
-}
-const ITEMS=allItems();
-function getVal(id){return Math.max(0,Math.min(100,Number(state[id]??0)))}
-function setVal(id,v){state[id]=Math.max(0,Math.min(100,Math.round(Number(v))));saveState();updateItem(id)}
-function pct(ids){return ids.length?Math.round(ids.reduce((s,id)=>s+getVal(id),0)/ids.length):0}
-function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function itemHTML(i){
- const v=getVal(i.id);
- return `<div class="item ${v===100?'done':''}" data-item="${i.id}" data-search="${(i.id+' '+i.name).toLowerCase()}">
-  <div class="name"><span class="num">#${i.id}</span>${esc(i.name)}</div>
-  <button class="step" onclick="setVal(${i.id},getVal(${i.id})-1)">−</button>
-  <input type="range" min="0" max="100" value="${v}" oninput="setVal(${i.id},this.value)">
-  <button class="step" onclick="setVal(${i.id},getVal(${i.id})+1)">+</button>
-  <div class="value">${v}%</div>
-  <button class="rev" onclick="setVal(${i.id},getVal(${i.id})+1)">+1 revised</button>
- </div>`;
-}
-function render(){
- const app=document.getElementById("app");app.innerHTML="";
- Object.entries(DATA).forEach(([topic,subs])=>{
-   const ids=subs.flatMap(s=>s.items.map(i=>i.id));
-   const d=document.createElement("details");d.className="topic";d.dataset.ids=ids.join(",");
-   let body="";
-   subs.forEach(sub=>{body+=`<div class="subhead">${esc(sub.title)}</div>`;sub.items.forEach(i=>body+=itemHTML(i));});
-   d.innerHTML=`<summary><span>${esc(topic)}</span><span class="topicPct">${pct(ids)}%</span></summary><div class="topic-body">${body}</div>`;
-   app.appendChild(d);
- });
- updateSummary();
-}
-function updateItem(id){
- const el=document.querySelector(`[data-item="${id}"]`);if(!el)return;
- const v=getVal(id);el.querySelector('input[type="range"]').value=v;el.querySelector(".value").textContent=v+"%";el.classList.toggle("done",v===100);
- const d=el.closest(".topic");const ids=d.dataset.ids.split(",").map(Number);d.querySelector(".topicPct").textContent=pct(ids)+"%";
-}
-function updateSummary(){
- const vals=ITEMS.map(i=>getVal(i.id));const total=vals.reduce((a,b)=>a+b,0);const p=Math.round(total/ITEMS.length);
- document.getElementById("overallPct").textContent=p+"%";document.getElementById("overallBar").style.width=p+"%";
- document.getElementById("startedCount").textContent=vals.filter(v=>v>0).length+" / "+ITEMS.length;
- document.getElementById("masteredCount").textContent=vals.filter(v=>v===100).length+" / "+ITEMS.length;
- document.getElementById("totalPoints").textContent=total.toLocaleString();
-}
-document.getElementById("search").addEventListener("input",e=>{
- const q=e.target.value.trim().toLowerCase();
- document.querySelectorAll(".item").forEach(el=>el.classList.toggle("hidden",q&&!el.dataset.search.includes(q)));
- document.querySelectorAll(".topic").forEach(t=>{const visible=[...t.querySelectorAll(".item")].some(i=>!i.classList.contains("hidden"));t.classList.toggle("hidden",q&&!visible);if(q&&visible)t.open=true});
-});
-document.getElementById("exportBtn").addEventListener("click",()=>{
- const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),state},null,2)],{type:"application/json"});
- const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="maths-revision-progress.json";a.click();URL.revokeObjectURL(a.href);
-});
-document.getElementById("importFile").addEventListener("change",async e=>{
- const f=e.target.files[0];if(!f)return;try{const o=JSON.parse(await f.text());state=o.state||o;saveState();render();alert("Maths progress imported.")}catch(err){alert("That is not a valid progress backup.")}e.target.value="";
-});
-document.getElementById("resetBtn").addEventListener("click",()=>{if(confirm("Reset all 266 maths packages to 0%?")){state={};saveState();render()}});
-window.addEventListener("beforeunload",saveState);
-document.addEventListener("visibilitychange",()=>{if(document.hidden)saveState()});
-init();
+    const extraStyle=d.createElement('style');
+    extraStyle.textContent=`
+      .major-section{margin:22px 0 30px}
+      .major-section>h2{margin:0 0 10px;padding:0 2px;font-size:22px;color:#eef4ff}
+      .major-section .topic{margin:9px 0}
+      .major-section .topic summary{padding:13px 15px}
+    `;
+    d.head.appendChild(extraStyle);
+
+    const app=d.getElementById('app');
+    if(!app || app.dataset.regrouped==='1') return;
+    const original=[...app.children].filter(el=>el.matches('details.topic'));
+    const fragment=d.createDocumentFragment();
+
+    original.forEach(big=>{
+      const majorTitle=big.querySelector('summary span:first-child')?.textContent?.trim() || 'Maths';
+      const section=d.createElement('section');
+      section.className='major-section';
+      const heading=d.createElement('h2');
+      heading.textContent=majorTitle;
+      section.appendChild(heading);
+
+      const oldBody=big.querySelector('.topic-body');
+      let current=null;
+      [...oldBody.children].forEach(node=>{
+        if(node.classList.contains('subhead')){
+          current=d.createElement('details');
+          current.className='topic';
+          const summary=d.createElement('summary');
+          summary.innerHTML=`<span>${node.textContent.trim()}</span><span class="topicPct">0%</span>`;
+          const body=d.createElement('div');
+          body.className='topic-body';
+          current.append(summary,body);
+          section.appendChild(current);
+        }else if(node.classList.contains('item')){
+          if(!current){
+            current=d.createElement('details');
+            current.className='topic';
+            const summary=d.createElement('summary');
+            summary.innerHTML='<span>Skills</span><span class="topicPct">0%</span>';
+            const body=d.createElement('div');
+            body.className='topic-body';
+            current.append(summary,body);
+            section.appendChild(current);
+          }
+          current.querySelector('.topic-body').appendChild(node);
+        }
+      });
+
+      [...section.querySelectorAll('details.topic')].forEach(group=>{
+        const items=[...group.querySelectorAll('.item')];
+        const ids=items.map(el=>Number(el.dataset.item));
+        group.dataset.ids=ids.join(',');
+        const vals=items.map(el=>parseInt(el.querySelector('.value')?.textContent||'0',10)||0);
+        const average=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
+        group.querySelector('.topicPct').textContent=average+'%';
+      });
+      fragment.appendChild(section);
+    });
+
+    app.replaceChildren(fragment);
+    app.dataset.regrouped='1';
+  }catch(err){console.error('Maths regrouping failed',err)}
+},80));
 </script>
-</body></html>
+</body>
+</html>
