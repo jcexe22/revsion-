@@ -9,27 +9,33 @@
 <body>
 <iframe id="mathsApp" src="./app.html" title="Edexcel Foundation Maths Revision Tracker"></iframe>
 <script>
+const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
 const GROUPS=[
-  {title:'1. Core Number Skills',start:1,end:13},
-  {title:'2. Factors, Multiples & Powers',start:14,end:26},
-  {title:'3. Fractions, Decimals, Percentages & Accuracy',start:27,end:40},
-  {title:'4. Algebra Basics',start:41,end:60},
-  {title:'5. Graphs',start:61,end:75},
-  {title:'6. Equations & Inequalities',start:76,end:86},
-  {title:'7. Sequences',start:87,end:95},
-  {title:'8. Ratio',start:96,end:105},
-  {title:'9. Scale & Proportion',start:106,end:114},
-  {title:'10. Percentages, Interest, Growth & Decay',start:115,end:124},
-  {title:'11. Compound Measures & Similarity',start:125,end:136},
-  {title:'12. Angles, Shapes & Polygons',start:137,end:150},
-  {title:'13. Constructions, Congruence & Transformations',start:151,end:167},
-  {title:'14. Circles & 3D Shapes',start:168,end:181},
-  {title:'15. Area, Perimeter, Surface Area & Volume',start:182,end:199},
-  {title:'16. Bearings, Coordinates, Pythagoras & Trigonometry',start:200,end:209},
-  {title:'17. Vectors',start:210,end:214},
-  {title:'18. Basic Probability',start:215,end:224},
-  {title:'19. Combined Probability',start:225,end:236},
-  {title:'20. Statistics',start:237,end:266}
+  {section:'NON-CALCULATOR PRACTICE',title:'1. Integers, Decimals & Core Operations',ids:range(1,13)},
+  {section:'NON-CALCULATOR PRACTICE',title:'2. Factors, Multiples, Powers & Roots',ids:range(14,24)},
+  {section:'NON-CALCULATOR PRACTICE',title:'3. Fractions, Decimals & Percentages',ids:range(27,32)},
+  {section:'NON-CALCULATOR PRACTICE',title:'4. Units, Estimation, Rounding & Bounds',ids:range(33,40)},
+  {section:'NON-CALCULATOR PRACTICE',title:'5. Algebra Foundations & Manipulation',ids:range(41,60)},
+  {section:'NON-CALCULATOR PRACTICE',title:'6. Coordinates & Straight-Line Graphs',ids:range(61,67)},
+  {section:'NON-CALCULATOR PRACTICE',title:'7. Equations & Inequalities',ids:range(76,86)},
+  {section:'NON-CALCULATOR PRACTICE',title:'8. Sequences',ids:range(87,95)},
+  {section:'NON-CALCULATOR PRACTICE',title:'9. Ratio & Basic Percentages',ids:[...range(96,105),...range(115,121)]},
+  {section:'NON-CALCULATOR PRACTICE',title:'10. Angles, Constructions & Transformations',ids:range(137,167)},
+  {section:'NON-CALCULATOR PRACTICE',title:'11. Core Geometry, Circles, Measures & Vectors',ids:[...range(168,173),...range(182,189),...range(200,203),...range(210,214)]},
+  {section:'NON-CALCULATOR PRACTICE',title:'12. Basic Probability & Core Statistics',ids:[...range(215,228),...range(237,257)]},
+
+  {section:'CALCULATOR PRACTICE',title:'13. Exact Number Work & Standard Form',ids:range(25,26)},
+  {section:'CALCULATOR PRACTICE',title:'14. Quadratic, Cubic, Reciprocal & Real-Life Graphs',ids:range(68,75)},
+  {section:'CALCULATOR PRACTICE',title:'15. Scale, Direct & Inverse Proportion',ids:range(106,114)},
+  {section:'CALCULATOR PRACTICE',title:'16. Interest, Growth & Decay',ids:range(122,124)},
+  {section:'CALCULATOR PRACTICE',title:'17. Compound Measures',ids:range(125,133)},
+  {section:'CALCULATOR PRACTICE',title:'18. Similarity & Scale Factors',ids:range(134,136)},
+  {section:'CALCULATOR PRACTICE',title:'19. 3D Shapes',ids:range(174,181)},
+  {section:'CALCULATOR PRACTICE',title:'20. Volume, Surface Area & Composite Solids',ids:range(190,197)},
+  {section:'CALCULATOR PRACTICE',title:'21. Arc Length & Sectors',ids:range(198,199)},
+  {section:'CALCULATOR PRACTICE',title:'22. Pythagoras & Trigonometry',ids:range(204,209)},
+  {section:'CALCULATOR PRACTICE',title:'23. Combined Probability',ids:range(229,236)},
+  {section:'CALCULATOR PRACTICE',title:'24. Scatter Graphs, Correlation & Prediction',ids:range(258,266)}
 ];
 
 const frame=document.getElementById('mathsApp');
@@ -40,50 +46,70 @@ frame.addEventListener('load',()=>setTimeout(()=>{
     if(science) science.remove();
 
     const subtitle=d.querySelector('.titlewrap .small');
-    if(subtitle) subtitle.innerHTML='20 topic groups • 266 revision packages • <span id="saveStatus">Auto-save on</span> • saved in this browser';
+    if(subtitle) subtitle.innerHTML='24 subtopic groups • 12 non-calculator + 12 calculator • 266 packages • <span id="saveStatus">Auto-save on</span>';
+
+    const note=d.querySelector('.note');
+    if(note) note.innerHTML='<b>Saved memory is ON.</b> All 266 packages are kept. They are organised into <b>12 non-calculator practice groups</b> and <b>12 calculator practice groups</b>. These are revision-practice groupings, not official paper restrictions — a skill can still be assessed in a different form on an Edexcel paper.';
 
     const style=d.createElement('style');
     style.textContent=`
-      #app{margin-top:8px}
-      .topic{margin:10px 0}
-      .topic summary{padding:15px 16px;font-size:16px}
+      #app{margin-top:10px}
+      .mode-section{margin:26px 0 34px}
+      .mode-heading{margin:0 0 5px;padding:12px 14px;border-radius:14px;background:#17213a;border:1px solid #263452;font-size:21px;letter-spacing:.3px}
+      .mode-sub{color:#9fb0cf;font-size:13px;margin:0 4px 12px}
+      .topic{margin:9px 0}
+      .topic summary{padding:14px 16px;font-size:16px}
       .topic-count{font-size:12px;color:#9fb0cf;font-weight:600;margin-left:auto;margin-right:12px}
-      @media(max-width:760px){.topic-count{display:none}}
+      @media(max-width:760px){.topic-count{display:none}.mode-heading{font-size:18px}}
     `;
     d.head.appendChild(style);
 
     const app=d.getElementById('app');
-    if(!app || app.dataset.twentyGroups==='1') return;
+    if(!app || app.dataset.calcGroups==='1') return;
 
     const allItems=[...app.querySelectorAll('.item')];
     const byId=new Map(allItems.map(el=>[Number(el.dataset.item),el]));
+
+    // Safety check: every one of the original 266 packages appears exactly once.
+    const assigned=GROUPS.flatMap(g=>g.ids);
+    const unique=new Set(assigned);
+    if(assigned.length!==266 || unique.size!==266 || Math.min(...unique)!==1 || Math.max(...unique)!==266){
+      throw new Error('Grouping does not contain all 266 unique packages.');
+    }
+
     const frag=d.createDocumentFragment();
+    ['NON-CALCULATOR PRACTICE','CALCULATOR PRACTICE'].forEach(sectionName=>{
+      const section=d.createElement('section');
+      section.className='mode-section';
+      const h=d.createElement('h2');
+      h.className='mode-heading';
+      h.textContent=sectionName==='NON-CALCULATOR PRACTICE'?'✍️ Non-Calculator Practice':'🧮 Calculator Practice';
+      section.appendChild(h);
+      const sub=d.createElement('div');
+      sub.className='mode-sub';
+      sub.textContent='12 manageable subtopic groups';
+      section.appendChild(sub);
 
-    GROUPS.forEach(g=>{
-      const detail=d.createElement('details');
-      detail.className='topic';
-      const ids=[];
-      for(let id=g.start;id<=g.end;id++) if(byId.has(id)) ids.push(id);
-      detail.dataset.ids=ids.join(',');
-
-      const summary=d.createElement('summary');
-      const vals=ids.map(id=>{
-        const el=byId.get(id);
-        return parseInt(el.querySelector('.value')?.textContent||'0',10)||0;
+      GROUPS.filter(g=>g.section===sectionName).forEach(g=>{
+        const detail=d.createElement('details');
+        detail.className='topic';
+        detail.dataset.ids=g.ids.join(',');
+        const vals=g.ids.map(id=>parseInt(byId.get(id)?.querySelector('.value')?.textContent||'0',10)||0);
+        const average=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
+        const summary=d.createElement('summary');
+        summary.innerHTML=`<span>${g.title}</span><span class="topic-count">${g.ids.length} packages</span><span class="topicPct">${average}%</span>`;
+        const body=d.createElement('div');
+        body.className='topic-body';
+        g.ids.forEach(id=>{const item=byId.get(id); if(item) body.appendChild(item);});
+        detail.append(summary,body);
+        section.appendChild(detail);
       });
-      const average=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
-      summary.innerHTML=`<span>${g.title}</span><span class="topic-count">${ids.length} packages</span><span class="topicPct">${average}%</span>`;
-
-      const body=d.createElement('div');
-      body.className='topic-body';
-      ids.forEach(id=>body.appendChild(byId.get(id)));
-      detail.append(summary,body);
-      frag.appendChild(detail);
+      frag.appendChild(section);
     });
 
     app.replaceChildren(frag);
-    app.dataset.twentyGroups='1';
-  }catch(err){console.error('20-group maths layout failed',err)}
+    app.dataset.calcGroups='1';
+  }catch(err){console.error('Calculator/non-calculator layout failed',err)}
 },100));
 </script>
 </body>
