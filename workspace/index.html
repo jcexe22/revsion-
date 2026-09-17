@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GCSE Revision Workspace</title>
+<style>
+:root{--bg:#08101f;--panel:#101a2f;--panel2:#16223b;--line:#263755;--text:#eef4ff;--muted:#9fb0cf;--accent:#7aa2ff;--good:#62d39b}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{display:flex;flex-direction:column;height:100vh;overflow:hidden}.top{padding:14px 16px 10px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0d172b,#08101f)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.title{font-size:20px;font-weight:800;margin-right:auto}.badge{font-size:12px;color:var(--muted);border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 9px}.tabs{display:flex;gap:8px;margin-top:10px}.tab,.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:11px;padding:9px 12px;font-weight:700;cursor:pointer}.tab.active{background:var(--panel2);border-color:var(--accent);box-shadow:0 0 0 1px rgba(122,162,255,.18) inset}.btn{font-size:12px;color:#dbe6ff}.focusbar{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.focusbar input{width:100%;border:1px solid var(--line);background:#0b1427;color:var(--text);border-radius:10px;padding:9px 11px;outline:none}.focusbar input:focus{border-color:var(--accent)}
+.status{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;background:var(--good);display:inline-block}.main{position:relative;flex:1;min-height:0}.frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg);display:none}.frame.active{display:block}
+@media(max-width:650px){.title{font-size:17px}.badge{display:none}.tab{flex:1}.tabs{width:100%}.focusbar{grid-template-columns:1fr}.btn{width:100%}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="row">
+    <div class="title">🎓 GCSE Revision Workspace</div>
+    <div class="badge" id="progressBadge">Live trackers • saved memory</div>
+  </div>
+  <div class="tabs">
+    <button class="tab" data-tab="science">🧬 Combined Science</button>
+    <button class="tab" data-tab="maths">➗ Maths</button>
+  </div>
+  <div class="focusbar">
+    <input id="focus" placeholder="Current topic, e.g. #182 Energy stores and transfers" autocomplete="off">
+    <button class="btn" id="refresh">↻ Refresh live trackers</button>
+  </div>
+  <div class="status"><span class="dot"></span><span id="saveStatus">Workspace memory is on</span></div>
+</header>
+<main class="main">
+  <iframe class="frame" id="science" src="../aqa_combined_science_revision_tracker_saved_memory.html" title="AQA Combined Science Tracker"></iframe>
+  <iframe class="frame" id="maths" src="../maths/" title="Maths Revision Tracker"></iframe>
+</main>
+<script>
+const KEY_TAB='gcseWorkspace:lastTab';
+const KEY_FOCUS='gcseWorkspace:currentTopic';
+const tabs=[...document.querySelectorAll('.tab')];
+const frames={science:document.getElementById('science'),maths:document.getElementById('maths')};
+const focus=document.getElementById('focus');
+const saveStatus=document.getElementById('saveStatus');
+const progressBadge=document.getElementById('progressBadge');
+
+function selectTab(name){
+  if(!frames[name]) name='science';
+  tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  Object.entries(frames).forEach(([k,f])=>f.classList.toggle('active',k===name));
+  localStorage.setItem(KEY_TAB,name);
+}
+
+tabs.forEach(b=>b.addEventListener('click',()=>selectTab(b.dataset.tab)));
+selectTab(localStorage.getItem(KEY_TAB)||'science');
+
+focus.value=localStorage.getItem(KEY_FOCUS)||'';
+let saveTimer;
+focus.addEventListener('input',()=>{
+  localStorage.setItem(KEY_FOCUS,focus.value);
+  saveStatus.textContent='Saving…';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>saveStatus.textContent='Workspace memory saved',350);
+});
+
+document.getElementById('refresh').addEventListener('click',()=>{
+  Object.values(frames).forEach(f=>{
+    const u=new URL(f.src,location.href);
+    u.searchParams.set('_live',Date.now());
+    f.src=u.href;
+  });
+  saveStatus.textContent='Loaded latest tracker versions';
+  setTimeout(()=>saveStatus.textContent='Workspace memory is on',1400);
+});
+
+// Both trackers are on the same GitHub Pages origin, so this workspace can
+// read their visible progress without changing how either tracker stores data.
+function readAverage(frame){
+  try{
+    const d=frame.contentDocument;
+    if(!d) return null;
+    const values=[...d.querySelectorAll('.item .value')]
+      .map(x=>parseInt(x.textContent,10))
+      .filter(Number.isFinite);
+    if(!values.length) return null;
+    return Math.round(values.reduce((a,b)=>a+b,0)/values.length);
+  }catch{return null;}
+}
+function updateBadge(){
+  const s=readAverage(frames.science),m=readAverage(frames.maths);
+  const parts=[];
+  if(s!==null) parts.push(`Science ${s}%`);
+  if(m!==null) parts.push(`Maths ${m}%`);
+  progressBadge.textContent=parts.length?parts.join(' • '):'Live trackers • saved memory';
+}
+Object.values(frames).forEach(f=>f.addEventListener('load',updateBadge));
+setInterval(updateBadge,1500);
+</script>
+</body>
+</html>
